@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gustavo Barboza Blanco - C10870</title>
+    <style type="text/css">
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh; /* Permite que el contenido crezca más allá del viewport si es necesario */
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        canvas {
+            margin-bottom: 20px; /* Ajusta este valor para mayor o menor espacio */
+        }
+    </style>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(','\\)']],
+                displayMath: [['\\[','\\]']]
+            }
+        };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+    <h1>Circuito de Inductor no lineal</h1>
+    <p>Un circuito de un inductor no lineal puede ser modelado por las ecuaciones diferenciales de primer orden:</p>
+    <p>\(\frac{dx}{dt} = y\)</p>
+    <p>\(\frac{dy}{dt} = -ky - x^3 + B \cos(t)\)</p>
+    <p>Oscilaciones caóticas para esta situación han sido extensamente estudiadas</p>
+    <p>Usando software de computadora: Construir el gráfico de la sección de Poincaré para el caso \(k=0.1\) y \( 9.8 \leq B \leq 13.4 \)</p>
+    <h2>Solución - Implementación</h2>
+    <p>El siguiente código resuelve las ecuaciones diferenciales dadas utilizando el método numérico RK4, el cuál fue escogido al ser un método ideal para resolver estas ecuaciones</p>
+    <p>Posteriormente se grafica pues ya tendriamos las soluciones para (x,y)</p>
+    <p>Por defecto se ponen los valores del límite superior, sin embargo, se le invita al usuario a jugar con los parámetros:</p>
+    <label for="k">Valor de k:</label>
+    <input type="number" id="k" value="0.1" step="0.01">
+    <label for="B">Valor de B:</label>
+    <input type="number" id="B" value="9.8" step="0.1">
+    <button onclick="startSimulation()">Simular</button>
+    <canvas id="phasePlot" width="600" height="600" style="border:1px solid black;"></canvas>
+    <!-- Implementación del código principal en Js -->
+    <script>
+        const canvas = document.getElementById('phasePlot');
+        const ctx = canvas.getContext('2d');
+        
+        // Función principal para inicializar la simulación
+        function startSimulation() {
+            const k = parseFloat(document.getElementById('k').value);
+            const B = parseFloat(document.getElementById('B').value);
+            simulatePhasePlot(k, B);
+        }
+
+        function simulatePhasePlot(k, B) {
+            // Se limpia el canvas -> Plano del gráfico
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Condiciones inciales
+            let x = 0, y = 0, t = 0;
+            const dt = 0.01;  // Paso del tiempo
+            const totalSteps = 100000;  // Número total de pasos
+
+            for (let i = 0; i < totalSteps; i++) {
+                // inicializamos el método RK4
+                const [dx1, dy1] = derivatives(x, y, t, k, B);
+                const [dx2, dy2] = derivatives(x + dx1 * dt / 2, y + dy1 * dt / 2, t + dt / 2, k, B);
+                const [dx3, dy3] = derivatives(x + dx2 * dt / 2, y + dy2 * dt / 2, t + dt / 2, k, B);
+                const [dx4, dy4] = derivatives(x + dx3 * dt, y + dy3 * dt, t + dt, k, B);
+
+                x += (dx1 + 2 * dx2 + 2 * dx3 + dx4) * dt / 6;
+                y += (dy1 + 2 * dy2 + 2 * dy3 + dy4) * dt / 6;
+                t += dt;
+
+                // Ploteamos todos los puntos
+                plotPoint(x, y);
+            }
+        }
+
+        // Función de las ecuaciones diferenciales al a cual le llamaremos: "derivatives" por simplicidad
+        function derivatives(x, y, t, k, B) {
+            const dxdt = y;
+            const dydt = -k * y - Math.pow(x, 3) + B * Math.cos(t);
+            return [dxdt, dydt];
+        }
+
+        // Ploteo de los puntos en el canvas:
+        function plotPoint(x, y) {
+            const scaleX = 20;  // Escalamos la vizualización 
+            const scaleY = 20;
+            const canvasX = canvas.width / 2 + x * scaleX;
+            const canvasY = canvas.height / 2 - y * scaleY;
+
+            if (canvasX >= 0 && canvasX <= canvas.width && canvasY >= 0 && canvasY <= canvas.height) {
+                ctx.fillRect(canvasX, canvasY, 1, 1);  // Se reduce el tamaño de los puntos para observar el gráfico de manera más detallada
+            }
+        }
+    </script>
+</body>
+</html>
