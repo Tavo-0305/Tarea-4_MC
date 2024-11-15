@@ -65,8 +65,8 @@
 
             // Condiciones inciales
             let x = 0, y = 0, t = 0;
-            const dt = 0.01;  // Paso del tiempo
-            const totalSteps = 100000;  // Número total de pasos
+            const dt = 0.0005;  // Paso del tiempo
+            const totalSteps = 500000;  // Número total de pasos
 
             for (let i = 0; i < totalSteps; i++) {
                 // inicializamos el método RK4
@@ -93,13 +93,13 @@
 
         // Ploteo de los puntos en el canvas:
         function plotPoint(x, y) {
-            const scaleX = 20;  // Escalamos la vizualización 
-            const scaleY = 20;
+            const scaleX = 30;  // Escalamos la vizualización 
+            const scaleY = 30;
             const canvasX = canvas.width / 2 + x * scaleX;
             const canvasY = canvas.height / 2 - y * scaleY;
 
             if (canvasX >= 0 && canvasX <= canvas.width && canvasY >= 0 && canvasY <= canvas.height) {
-                ctx.fillRect(canvasX, canvasY, 1, 1);  // Se reduce el tamaño de los puntos para observar el gráfico de manera más detallada
+                ctx.fillRect(canvasX, canvasY, 0.5, 0.5);  // Se reduce el tamaño de los puntos para observar el gráfico de manera más detallada
             }
         }
     </script>
